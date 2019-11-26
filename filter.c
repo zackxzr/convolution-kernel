@@ -46,6 +46,8 @@ PPMImage *readPPM(char *filename)
 {
     FILE *fp;
     char buf[16];
+    int rgb_comp_color;
+
     fp = fopen(filename, "rb");
 
     if (!fp)
@@ -57,7 +59,11 @@ PPMImage *readPPM(char *filename)
     /*File type*/
     fgets(buf, sizeof(buf), fp);
     if (buf[0] != 'P' || buf[1] != '6')
+    {
+        printf("Invalid image format");
         exit(-1);
+    }
+
     /*Reading past comments*/
     int c = getc(fp);
     while (c == '#')
@@ -68,26 +74,33 @@ PPMImage *readPPM(char *filename)
     ungetc(c, fp);
 
     PPMImage *img = (PPMImage *)malloc(sizeof(PPMImage) + 1);
-    fscanf(fp, "%d %d", &img->width, &img->height);
+    if (!img)
+    {
+        printf("Unable to allocate memory");
+        exit(-1);
+    }
 
-    // read rgb component
-    int rgb_comp_color;
+    if (fscanf(fp, "%d %d", &img->width, &img->height) != 2)
+    {
+        printf("Invalid image size");
+        exit(-1);
+    }
+
     if (fscanf(fp, "%d", &rgb_comp_color) != 1)
     {
         printf("Invalid rgb component\n");
         exit(-1);
     }
+
     if (rgb_comp_color != RGB_COMPONENT_COLOR)
     {
         printf(" '%s' doesnot have 8-bits component \n", filename);
         exit(-1);
     }
 
-    while (fgetc(fp) != '\n')
-        ;
+    while (fgetc(fp) != '\n');
 
-    img->pixel =
-        (PPMPixel *)malloc(img->width * img->height * sizeof(PPMPixel) + 1);
+    img->pixel = (PPMPixel *)malloc(img->width * img->height * sizeof(PPMPixel) + 1);
 
     if (!img->pixel)
     {
@@ -95,7 +108,7 @@ PPMImage *readPPM(char *filename)
         exit(-1);
     }
 
-    // read pixel data from file
+    /*read pixel data from file*/
     fread(img->pixel, sizeof(PPMPixel), img->width * img->height, fp);
     fclose(fp);
     return img;
@@ -160,14 +173,14 @@ PPMImage *applyKernel(PPMImage *img, char *kernelfile)
 
     Ks /= 2;
     double cp[3];
-
+    /* iterate through image */
     for (int ix = 0; ix < img->width; ix++)
-    { // Iterae through image
+    { 
         for (int iy = 0; iy < img->height; iy++)
         {
             cp[0] = cp[1] = cp[2] = 0.0;
             for (int kx = -Ks; kx <= Ks; kx++)
-            { // Apply the kernel
+            { /* Apply the kernel */
                 for (int ky = -Ks; ky <= Ks; ky++)
                 {
                     for (int l = 0; l < 3; l++)
