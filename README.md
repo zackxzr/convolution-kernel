@@ -1,4 +1,5 @@
 # convolution_kernel
-Image processing using convolution kernel
+This is an Image Processing program which applies filters to an image with the use of a convolution kernel.
 
-A convolution program which reads an image as a .ppm file and applys a convolution kernel. The processed image is saved as a new .ppm file.
+How it works:
+A .ppm image is read and it's pixel's RGB values are stored in an array. Using the given kernel, a filter is applied on the image via convolution. The processed image is then saved as an output.ppm file.
