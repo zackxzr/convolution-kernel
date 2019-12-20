@@ -8,7 +8,7 @@ A .ppm image is read and each pixel's RGB values are stored in an array. Using t
 ### A visual example
 
 When given an input image like this:
-![input image](flowers.ppm)
+![input image](flowers.jpg)
 
 applying an edge detect kernel of:
 ```
